@@ -115,7 +115,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       this.outerArc = d3.arc()
         .innerRadius(radius * 0.7)
         .outerRadius(radius * 0.7);
-      const arcs = group.selectAll("arc")
+      const arcs = group.selectAll("g.arc")
         .data(this.pieData)
         .enter()
         .append("g")
