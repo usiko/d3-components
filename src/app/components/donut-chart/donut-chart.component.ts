@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
-import { Selection, Arc, PieArcDatum } from 'd3';
+import { Selection, Arc, PieArcDatum, Pie, selection } from 'd3';
 import * as d3 from 'd3';
 @Component({
   selector: 'app-donut-chart',
@@ -27,6 +27,10 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     {
       label: 'optionsc=10',
       value: 5,
+    },
+    {
+      label: 'optionsc=1',
+      value: 1,
     }
   ];
   static incrementId = 0;
@@ -36,27 +40,25 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
   private width = 0;
 
   private svg?: Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  private dataContainer?: Selection<SVGGElement, unknown, HTMLElement, any>;
 
   private arc?: Arc<any, d3.DefaultArcObject>;
   private outerArc?: Arc<any, d3.DefaultArcObject>;
-  private pieData?: PieArcDatum<{ label: string, value: number; }>[];
+
+  private pie?: Pie<any, {
+    label: string;
+    value: number;
+  }>;
 
   constructor() { }
 
   ngOnInit(): void {
     this.containerId = this.generateUniqId();
+
   }
 
   ngAfterViewInit(): void {
-    if (this.container) {
-      const containerId: string = this.generateUniqId();
-      this.container.nativeElement.id = containerId;
-      this.setSize();
-      this.initSvg(containerId);
-
-
-
-    }
+    this.init();
   }
 
   private setSize() {
@@ -67,6 +69,42 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
   private generateUniqId(): string {
     DonutChartComponent.incrementId++;
     return 'donutChart' + DonutChartComponent.incrementId;
+
+  }
+
+  init() {
+    if (this.container) {
+      const containerId: string = this.generateUniqId();
+      this.container.nativeElement.id = containerId;
+      this.setSize();
+      this.initSvg(containerId);
+    }
+
+    const radius = Math.min(this.width, this.height) / 2;
+    const innerRadius = this.innerRadiusRatio ? (radius * 0.6) * (this.innerRadiusRatio / 100) : 0; // percent ratio
+
+    this.arc = d3.arc()
+      .innerRadius(innerRadius)
+      .outerRadius(radius * 0.6);
+    this.outerArc = d3.arc()
+      .innerRadius(radius * 0.7)
+      .outerRadius(radius * 0.7);
+
+    this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value);
+
+    this.drawDonut();
+    setInterval(() => {
+      this.data[0].value++;
+      this.data.push({
+        label: 'test',
+        value: 2
+      });
+      if (this.pie) {
+        console.log('update', this.data);
+        this.buildPieChart(this.data);
+      }
+
+    }, 1000);
 
   }
 
@@ -83,58 +121,94 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     this.svg.attr('height', this.container?.nativeElement.offsetHeight);
 
 
-    const pie = d3.pie<{ label: string, value: number; }>().value(d => d.value);
-    this.pieData = pie(this.data);
-    this.drawDonut();
 
 
+
+
+
+
+  }
+
+  private initContainer() {
+    if (this.svg) {
+      this.dataContainer = this.svg.append('g').attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+    }
 
   }
 
   private drawDonut() {
-    this.buildPieChart();
+    this.initContainer();
+    this.buildPieChart(this.data);
 
   }
 
 
-  private buildPieChart() {
-    if (this.svg && this.pieData) {
+  private buildPieChart(data: { label: string, value: number; }[]) {
+    if (this.dataContainer && this.pie) {
 
 
-      const group = this.svg.append('g').attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
-      const radius = Math.min(this.width, this.height) / 2;
+      const pieData = this.pie(data);
+
 
 
 
       const colorsScale = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
 
-      const innerRadius = this.innerRadiusRatio ? (radius * 0.6) * (this.innerRadiusRatio / 100) : 0; // percent ratio
-      this.arc = d3.arc()
-        .innerRadius(innerRadius)
-        .outerRadius(radius * 0.6);
-      this.outerArc = d3.arc()
-        .innerRadius(radius * 0.7)
-        .outerRadius(radius * 0.7);
-      const arcs = group.selectAll("g.arc")
-        .data(this.pieData)
+
+
+      /*dataSelect.join(enter =>
+        enter
+          .append('g')
+          .attr("class", "arc")
+          .append('path'),
+        update => update.call(selection => {
+          selection.select('path')
+            .attr("fill", (d, i) => {
+              console.log(d, i);
+              return colorsScale(i.toString());
+            }).attr("d", this.arc as any);
+        })
+      );*/
+      this.dataContainer.selectAll("g.arc")
+        .data(pieData)
         .enter()
         .append("g")
-        .attr("class", "arc");
-      arcs.append('path').attr("fill", (d, i) => {
-        return colorsScale(i.toString());
-      }).attr("d", this.arc as any);
-      this.buildLegendLines(group, radius);
-      this.buildLegends(group, radius);
+        .attr("class", "arc")
+        .append('path');
+
+      this.dataContainer.selectAll("g.arc").select('path')
+        .attr("fill", (d, i) => {
+          console.log(d, i);
+          return colorsScale(i.toString());
+        }).attr("d", this.arc as any);
+      /* arcs.transition()
+         .duration(3000);*/
+
+      //
+
+
+      //this.buildLegendLines(data, this.dataContainer);
+      //this.buildLegends(data, this.dataContainer);
     }
 
 
   }
 
-  private buildLegendLines(group: Selection<SVGGElement, unknown, HTMLElement, any>, radius: number) {
+  /*arcTween(d,index)
+  {
+    const context:any = this as any;
+    const i = d3.interpolate(this._current,d);
+    if(index === 1) console.log(this._current, i(0));
+    this._current = i(0);
+    return function (t) { return arc(i(t), index); };
+  }*/
 
-    if (this.pieData) {
+  private buildLegendLines(data: { label: string, value: number; }[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
+    const radius = Math.min(this.width, this.height) / 2;
+    if (this.pie) {
+      const pieData = this.pie(data);
       group.selectAll('polyline')
-        .data(this.pieData)
+        .data(pieData)
         .enter()
         .append('polyline')
         .style("fill", "none")
@@ -156,10 +230,12 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
 
   }
 
-  private buildLegends(group: Selection<SVGGElement, unknown, HTMLElement, any>, radius: number) {
-    if (this.pieData) {
+  private buildLegends(data: { label: string, value: number; }[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
+    const radius = Math.min(this.width, this.height) / 2;
+    if (this.pie) {
+      const pieData = this.pie(data);
       group.selectAll('text')
-        .data(this.pieData)
+        .data(pieData)
         .enter()
         .append('text')
         .text((d) => {
