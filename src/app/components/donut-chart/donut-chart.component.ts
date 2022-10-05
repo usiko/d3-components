@@ -50,6 +50,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     value: number;
   }>;
 
+  private angleInterpolation?: any;
   constructor() { }
 
   ngOnInit(): void {
@@ -91,6 +92,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       .outerRadius(radius * 0.7);
 
     this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value);
+    this.angleInterpolation = d3.interpolate(this.pie.startAngle(), this.pie.endAngle());
 
     this.drawDonut();
     setInterval(() => {
@@ -175,14 +177,32 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         .append("g")
         .attr("class", "arc")
         .append('path');
+      /**/
 
       this.dataContainer.selectAll("g.arc").select('path')
         .attr("fill", (d, i) => {
           console.log(d, i);
           return colorsScale(i.toString());
-        }).attr("d", this.arc as any);
-      /* arcs.transition()
-         .duration(3000);*/
+        })
+        .attr("d", this.arc as any)
+        .transition()
+        .duration(3000)
+
+        .attrTween("d", (d: any) => {
+          const interpolate = d3.interpolate(d.startAngle + 0.1, d.endAngle);
+          return (t: any) => {
+            d.endAngle = interpolate(t);
+            if (this.arc) {
+              return this.arc(d) as any;
+            }
+            return 0;
+          };
+
+
+
+
+        });
+
 
       //
 
@@ -194,14 +214,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
 
   }
 
-  /*arcTween(d,index)
-  {
-    const context:any = this as any;
-    const i = d3.interpolate(this._current,d);
-    if(index === 1) console.log(this._current, i(0));
-    this._current = i(0);
-    return function (t) { return arc(i(t), index); };
-  }*/
+
 
   private buildLegendLines(data: { label: string, value: number; }[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
     const radius = Math.min(this.width, this.height) / 2;
