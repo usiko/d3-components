@@ -99,7 +99,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     this.angleInterpolation = d3.interpolate(this.pie.startAngle(), this.pie.endAngle());
 
     this.drawDonut();
-    setInterval(() => {
+    setTimeout(() => {
       this.data[0].value++;
       this.data.push({
         label: 'test',
@@ -228,8 +228,8 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       //
 
 
-      //this.buildLegendLines(data, this.dataContainer);
-      //this.buildLegends(data, this.dataContainer);
+      this.buildLegendLines(data, this.dataContainer);
+      this.buildLegends(data, this.dataContainer);
     }
 
 
@@ -247,19 +247,22 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         .append('polyline')
         .style("fill", "none")
         .attr("stroke", "black")
-        .attr("stroke-width", 1)
-        .attr('points', (d: any) => {
-          if (this.arc && this.outerArc) {
-            const posA = this.arc.centroid(d); // line insertion in the slice
-            const posB = this.outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
-            const posC = this.outerArc.centroid(d); // Label position = almost the same as posB
-            console.log(d, posA, posB, posC);
-            const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
-            posC[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
-            return [posA, posB, posC] as any;
-          }
-          return [];
-        });
+        .attr("stroke-width", 1);
+
+
+      group.selectAll('polyline').attr('points', (d: any) => {
+        if (this.arc && this.outerArc) {
+          console.log('polyline', d);
+          const posA = this.arc.centroid(d); // line insertion in the slice
+          const posB = this.outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
+          const posC = this.outerArc.centroid(d); // Label position = almost the same as posB
+          console.log(d, posA, posB, posC);
+          const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
+          posC[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+          return [posA, posB, posC] as any;
+        }
+        return [];
+      });
     }
 
   }
@@ -271,10 +274,11 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       group.selectAll('text')
         .data(pieData)
         .enter()
-        .append('text')
-        .text((d) => {
-          return d.data.label;
-        })
+        .append('text');
+
+      group.selectAll('text').text((d: any) => {
+        return d.data.label;
+      })
         .attr('transform', (d: any) => {
           if (this.outerArc) {
             var pos = this.outerArc.centroid(d);
