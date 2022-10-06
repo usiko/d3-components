@@ -91,7 +91,11 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       .innerRadius(radius * 0.7)
       .outerRadius(radius * 0.7);
 
-    this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value);
+    this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value).sort((a, b) => {
+      if (a.value < b.value) { return -1; }
+      if (a.value > b.value) { return 1; }
+      return 0;
+    });
     this.angleInterpolation = d3.interpolate(this.pie.startAngle(), this.pie.endAngle());
 
     this.drawDonut();
@@ -106,13 +110,13 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         this.buildPieChart(this.data);
       }
 
-    }, 1000);
+    }, 2000);
 
   }
 
   /**
- * init the whole svg container
- */
+   * init the whole svg container
+   */
   private initSvg(containerId: string) {
     const select = d3.select('#' + containerId);
     console.log('container select', select);
@@ -160,15 +164,15 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
 
       /*dataSelect.join(enter =>
         enter
-          .append('g')
-          .attr("class", "arc")
-          .append('path'),
+        .append('g')
+        .attr("class", "arc")
+        .append('path'),
         update => update.call(selection => {
-          selection.select('path')
-            .attr("fill", (d, i) => {
-              console.log(d, i);
-              return colorsScale(i.toString());
-            }).attr("d", this.arc as any);
+        selection.select('path')
+          .attr("fill", (d, i) => {
+          console.log(d, i);
+          return colorsScale(i.toString());
+          }).attr("d", this.arc as any);
         })
       );*/
       this.dataContainer.selectAll("g.arc")
@@ -186,12 +190,29 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         })
         .attr("d", this.arc as any)
         .transition()
-        .duration(3000)
-
-        .attrTween("d", (d: any) => {
-          const interpolate = d3.interpolate(d.startAngle + 0.1, d.endAngle);
+        .duration(1000)
+        .attr("endAngle", (d: any) => {
+          return d.endAngle;
+        }) // binding the new end Angle to the arc for later reference to work out what previous end angle was
+        .attr("startAngle", (d: any) => {
+          return d.startAngle;
+        }) // binding the new end Angle to the arc for later reference to work out what previous end angle was
+        .attrTween("d", (d: any, index, n) => {
+          const selection = d3.select(n[index]);
+          const lastEndAngle = selection.attr("endAngle");
+          const lastStartAngle = selection.attr("startAngle");
+          let lastselection: any;
+          if (n[index - 1]) {
+            lastselection = d3.select(n[index - 1]);
+          }
+          console.log('I1', (lastEndAngle !== null) ? lastEndAngle : (lastselection?.attr("startAngle") || 0), d.endAngle);
+          console.log('I2', (lastStartAngle !== null) ? lastStartAngle : (lastselection?.attr("endAngle") || 0), d.startAngle);
+          const interpolate1 = d3.interpolate((lastEndAngle !== null) ? lastEndAngle : (lastselection?.attr("endAngle") || 0), d.endAngle);
+          const interpolate2 = d3.interpolate((lastStartAngle !== null) ? lastStartAngle : (lastselection?.attr("endAngle") || 0), d.startAngle);
           return (t: any) => {
-            d.endAngle = interpolate(t);
+            //console.log(t, d);
+            d.endAngle = interpolate1(t);
+            d.startAngle = interpolate2(t);
             if (this.arc) {
               return this.arc(d) as any;
             }
@@ -271,6 +292,10 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     }
 
   }
+
+  private endAngleFunction(d: any) {
+    return (d['percentage-value']) * ((2 * Math.PI) / 180);
+  };
 
 
 }
