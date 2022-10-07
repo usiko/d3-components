@@ -99,7 +99,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
     this.angleInterpolation = d3.interpolate(this.pie.startAngle(), this.pie.endAngle());
 
     this.drawDonut();
-    setTimeout(() => {
+    setInterval(() => {
       this.data[0].value++;
       this.data.push({
         label: 'test',
@@ -198,26 +198,9 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
           return d.startAngle;
         }) // binding the new end Angle to the arc for later reference to work out what previous end angle was
         .attrTween("d", (d: any, index, n) => {
-          const selection = d3.select(n[index]);
-          const lastEndAngle = selection.attr("endAngle");
-          const lastStartAngle = selection.attr("startAngle");
-          let lastselection: any;
-          if (n[index - 1]) {
-            lastselection = d3.select(n[index - 1]);
-          }
-          console.log('I1', (lastEndAngle !== null) ? lastEndAngle : (lastselection?.attr("startAngle") || 0), d.endAngle);
-          console.log('I2', (lastStartAngle !== null) ? lastStartAngle : (lastselection?.attr("endAngle") || 0), d.startAngle);
-          const interpolate1 = d3.interpolate((lastEndAngle !== null) ? lastEndAngle : (lastselection?.attr("endAngle") || 0), d.endAngle);
-          const interpolate2 = d3.interpolate((lastStartAngle !== null) ? lastStartAngle : (lastselection?.attr("endAngle") || 0), d.startAngle);
-          return (t: any) => {
-            //console.log(t, d);
-            d.endAngle = interpolate1(t);
-            d.startAngle = interpolate2(t);
-            if (this.arc) {
-              return this.arc(d) as any;
-            }
-            return 0;
-          };
+
+          return this.pieTransition(d, index, n) as any;
+
 
 
 
@@ -250,19 +233,31 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
         .attr("stroke-width", 1);
 
 
-      group.selectAll('polyline').attr('points', (d: any) => {
-        if (this.arc && this.outerArc) {
-          console.log('polyline', d);
-          const posA = this.arc.centroid(d); // line insertion in the slice
-          const posB = this.outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
-          const posC = this.outerArc.centroid(d); // Label position = almost the same as posB
-          console.log(d, posA, posB, posC);
-          const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
-          posC[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
-          return [posA, posB, posC] as any;
-        }
-        return [];
-      });
+      group.selectAll('polyline')
+        .transition()
+        .duration(1000)
+        /*.attr('points', (d: any) => {
+          if (this.arc && this.outerArc) {
+            console.log('polyline', d);
+            const posA = this.arc.centroid(d); // line insertion in the slice
+            const posB = this.outerArc.centroid(d); // line break: we use the other arc generator that has been built only for that
+            const posC = this.outerArc.centroid(d); // Label position = almost the same as posB
+            console.log(d, posA, posB, posC);
+            const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2; // we need the angle to see if the X position will be at the extreme right or extreme left
+            posC[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+            return [posA, posB, posC] as any;
+          }
+          return [];
+        })*/
+        .attrTween("points", (d: any, index, n) => {
+
+          return this.lineAttrTween(d, index, n) as any;
+
+
+
+
+
+        });
     }
 
   }
@@ -279,10 +274,13 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
       group.selectAll('text').text((d: any) => {
         return d.data.label;
       })
-        .attr('transform', (d: any) => {
+        .transition()
+
+        .duration(1000)
+        /*.attr('transform', (d: any) => {
           if (this.outerArc) {
             var pos = this.outerArc.centroid(d);
-            var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+            const midangle = this.getMidAngle(d.startAngle, d.endAngle);
             pos[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1);
             return 'translate(' + pos + ')';
           }
@@ -290,16 +288,140 @@ export class DonutChartComponent implements OnInit, AfterViewInit {
 
         })
         .style('text-anchor', (d: any) => {
-          var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+          const midangle = this.getMidAngle(d.startAngle, d.endAngle);
           return (midangle < Math.PI ? 'start' : 'end');
+        })*/
+        .attrTween("transform", (d: any, index, n) => {
+          return this.legentAttrTween(d, index, n);
+        }).styleTween('text-anchor', (d, i, n) => {
+          return this.legentStyleTween(d, i, n);
         });
+      //group.selectAll('text').exit().remove();
+
     }
 
   }
 
-  private endAngleFunction(d: any) {
-    return (d['percentage-value']) * ((2 * Math.PI) / 180);
-  };
+  private pieTransition(d: any, index: number, n: any) {
+    /*const selection = d3.select(n[index]);
+    const lastEndAngle = selection.attr("endAngle");
+    const lastStartAngle = selection.attr("startAngle");
+    let lastselection: any;
+    if (n[index - 1]) {
+      lastselection = d3.select(n[index - 1]);
+    }
+    const interpolate1 = d3.interpolate((lastEndAngle !== null) ? lastEndAngle : (lastselection?.attr("endAngle") || 0), d.endAngle);
+    const interpolate2 = d3.interpolate((lastStartAngle !== null) ? lastStartAngle : (lastselection?.attr("endAngle") || 0), d.startAngle);
+    return (t: any) => {
+      //console.log(t, d);
+      d.endAngle = interpolate1(t);
+      d.startAngle = interpolate2(t);
+      if (this.arc) {
+        return this.arc(d) as any;
+      }
+      return 0;
+       };*/
+
+    const interpolate = this.getInterpolation(d, index, n);
+
+    return (t: any) => {
+      if (this.arc) {
+        return this.arc(interpolate(t));
+      }
+
+      return '';
+    };
+
+  }
+
+
+  /*private legendTransition(d: any, index: number, n: any) {
+    const radius = Math.min(this.width, this.height) / 2;
+    var pos: number[] = this.outerArc?.centroid(d) || [0, 0];
+    var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+    pos[0] = radius * 0.7 * (midangle < Math.PI ? 1 : -1);
+    const selection = d3.select(n[index]);
+    const lastPos = selection.attr("pos").split(',');
+    const interpolate1 = d3.interpolate(lastPos[0], pos[0] as any);
+    const interpolate2 = d3.interpolate(lastPos[1], pos[1] as any);
+    return (t: any) => {
+      //console.log(t, d);
+      return 'translate(' + [interpolate1(t), interpolate2(t)] + ')';
+    };
+  }*/
+
+  private legentAttrTween(d: any, index: number, n: any) {
+    console.log('legend', n[index]._currentData);
+    const interpolate = this.getInterpolation(d, index, n);
+
+    return (t: any) => {
+      if (this.outerArc) {
+        const radius = Math.min(this.width, this.height) / 2;
+        var d2 = interpolate(t);
+        var pos = this.outerArc.centroid(d2);
+        pos[0] = radius * 0.7 * (this.getMidAngle(d2.startAngle, d2.endAngle) < Math.PI ? 1 : -1);
+        return "translate(" + pos + ")";
+      }
+      return "translate(" + [0, 0] + ")";
+    };
+  }
+
+  private legentStyleTween(d: any, index: number, n: any) {
+    const interpolate = this.getInterpolation(d, index, n);
+
+
+    //this._current = interpolate(0);
+    return (t: any) => {
+      const d2 = interpolate(t);
+      return this.getMidAngle(d2.startAngle, d2.endAngle) < Math.PI ? "start" : "end";
+    };
+  }
+
+  private lineAttrTween(d: any, index: number, n: any) {
+
+    const interpolate = this.getInterpolation(d, index, n);
+
+    return (t: any) => {
+      if (this.outerArc && this.arc) {
+        const radius = Math.min(this.width, this.height) / 2;
+        var d2 = interpolate(t);
+        var pos = this.outerArc.centroid(d2);
+        pos[0] = radius * 0.7 * (this.getMidAngle(d2.startAngle, d2.endAngle) < Math.PI ? 1 : -1);
+        return [this.arc.centroid(d2), this.outerArc.centroid(d2), pos];
+      }
+      return [0, 0, 0];
+    };
+
+  }
+
+  private getMidAngle(startAngle: number, endAngle: number): number {
+    return startAngle + (endAngle - startAngle) / 2;
+  }
+
+  private getInterpolation(d: any, i: number, n: any) {
+    const element = n[i];
+    if (!element._currentData) {
+      const lastElement = n[i - 1];
+      const startAngle = (lastElement && lastElement._currentData) ? lastElement._currentData.endAngle : d.startAngle; // angle de depart par rapport a l'angle de fin du dernier
+      const startingData = {
+        ...d,
+        startAngle: startAngle,
+        endAngle: startAngle // size 0 angle de fin  = angle de depart
+      };
+      const startInterpolate = d3.interpolate(startingData, d);
+      const interpolate = d3.interpolate(element._currentData, d);
+      element._currentData = interpolate(0);
+      return startInterpolate;
+    }
+    else {
+      element._currentData = element._currentData || d;
+      const interpolate = d3.interpolate(element._currentData, d);
+      element._currentData = interpolate(0);
+      return interpolate;
+    }
+
+  }
+
 
 
 }
