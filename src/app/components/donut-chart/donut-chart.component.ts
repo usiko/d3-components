@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Selection, Arc, PieArcDatum, Pie, selection } from 'd3';
 import * as d3 from 'd3';
 @Component({
@@ -6,12 +6,7 @@ import * as d3 from 'd3';
   templateUrl: './donut-chart.component.html',
   styleUrls: ['./donut-chart.component.scss']
 })
-export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    this.setSize();
-
-  }
+export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   @ViewChild('container') container?: ElementRef;
   @Input() colors: string[] = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"];
   @Input() innerRadiusRatio: number = 0;
@@ -33,15 +28,24 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
     value: number;
   }>;
 
-  private angleInterpolation?: any;
+  private resizeObserver?: ResizeObserver;
   constructor() { }
 
   ngOnInit(): void {
     this.containerId = this.generateUniqId();
+    this.resizeObserver = new ResizeObserver(entries => {
+      //const height = entries[0].contentRect.height;
+      //const width = entries[0].contentRect.width;
+      this.setSize();
+
+    });
 
   }
 
   ngAfterViewInit(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.observe(this.container?.nativeElement);
+    }
     this.init();
   }
 
@@ -58,6 +62,18 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
   private setSize() {
     this.height = this.container?.nativeElement.offsetHeight;
     this.width = this.container?.nativeElement.offsetWidth;
+    this.setArcs();
+    if (this.svg) {
+      this.svg.attr('width', this.width);
+      this.svg.attr('height', this.height);
+    }
+    if (this.dataContainer) {
+      this.dataContainer.attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+    }
+    if (this.pie) {
+      console.log('update', this.data);
+      this.buildPieChart(this.data);
+    }
   }
 
   private generateUniqId(): string {
@@ -74,6 +90,22 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
       this.initSvg(containerId);
     }
 
+
+
+    this.setArcs();
+    this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value).sort((a, b) => {
+      if (a.value < b.value) { return -1; }
+      if (a.value > b.value) { return 1; }
+      return 0;
+    });
+
+
+    this.drawDonut();
+
+
+  }
+
+  setArcs() {
     const radius = Math.min(this.width, this.height) / 2;
     const innerRadius = this.innerRadiusRatio ? (radius * 0.6) * (this.innerRadiusRatio / 100) : 0; // percent ratio
 
@@ -83,17 +115,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
     this.outerArc = d3.arc()
       .innerRadius(radius * 0.7)
       .outerRadius(radius * 0.7);
-
-    this.pie = d3.pie<{ label: string, value: number; }>().value(d => d.value).sort((a, b) => {
-      if (a.value < b.value) { return -1; }
-      if (a.value > b.value) { return 1; }
-      return 0;
-    });
-    this.angleInterpolation = d3.interpolate(this.pie.startAngle(), this.pie.endAngle());
-
-    this.drawDonut();
-
-
   }
 
   /**
@@ -105,8 +126,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
     this.svg = select.append('svg');
 
 
-    this.svg.attr('width', this.container?.nativeElement.offsetWidth);
-    this.svg.attr('height', this.container?.nativeElement.offsetHeight);
 
 
 
@@ -119,7 +138,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
 
   private initContainer() {
     if (this.svg) {
-      this.dataContainer = this.svg.append('g').attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+      this.dataContainer = this.svg.append('g').classed('container', true).attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
     }
 
   }
@@ -180,7 +199,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
 
 
   private buildLegendLines(data: { label: string, value: number; }[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
-    const radius = Math.min(this.width, this.height) / 2;
     if (this.pie) {
       const pieData = this.pie(data);
       group.selectAll('polyline')
@@ -206,7 +224,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private buildLegends(data: { label: string, value: number; }[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
-    const radius = Math.min(this.width, this.height) / 2;
     if (this.pie) {
       const pieData = this.pie(data);
       group.selectAll('text')
@@ -298,6 +315,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
     if (!element._currentData) {
       const lastElement = n[i - 1];
       const startAngle = (lastElement && lastElement._currentData) ? lastElement._currentData.endAngle : d.startAngle; // angle de depart par rapport a l'angle de fin du dernier
+      const endAngle = (lastElement && lastElement._currentData) ? lastElement._currentData.endAngle : d.endAngle; // angle de depart par rapport a l'angle de fin du dernier
       const startingData = {
         ...d,
         startAngle: startAngle,
@@ -317,6 +335,12 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnChanges {
 
   }
 
+
+  ngOnDestroy(): void {
+    if (this.container && this.resizeObserver) {
+      this.resizeObserver?.unobserve(this.container.nativeElement);
+    }
+  }
 
 
 }

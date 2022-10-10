@@ -1,4 +1,10 @@
 .donut {
-  height: 500px;
-  width: 500px;
-}
+    max-height: 100%;
+    min-height: 600px;
+    width: 100%;
+    position: relative;
+  
+    app-donut-chart {
+      position: absolute;
+    }
+  }
