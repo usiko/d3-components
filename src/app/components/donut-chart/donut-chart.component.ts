@@ -159,7 +159,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 
 
-      const colorsScale = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+      const colorsScale = d3.scaleOrdinal(this.colors);
 
 
 
