@@ -5,15 +5,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DonutChartComponent } from './components/donut-chart/donut-chart.component';
 import { DonutChartModule } from './components/donut-chart/donut-chart.module';
+import { GraphNodeModule } from 'src/app/components/graph-node';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
   ],
   imports: [
-    BrowserModule,
+      BrowserModule,
+      BrowserAnimationsModule,
       AppRoutingModule,
-    DonutChartModule
+    DonutChartModule,
+    GraphNodeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
