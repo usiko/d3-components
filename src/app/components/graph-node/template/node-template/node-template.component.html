@@ -1,0 +1,22 @@
+<div class="template" (dblclick)="onDblclick()">
+
+    <div class="node">
+  <div class="circle" [style.borderColor]="node.meta?.color">
+    <div class="icon" *ngIf="node.meta?.icon?.name"
+    [style.color]="node.meta?.icon?.color || node.meta?.color "
+    [style.fontSize]="node.meta?.icon?.frontSize"
+    [style.fontFamily]="node.meta?.icon?.fontFamily"
+
+    >{{node.meta?.icon?.name}}</div>
+  </div>
+
+</div>
+ <div class="title"
+ [style.color]="node.meta?.label?.color"
+  [style.fontSize]="node.meta?.label?.fontSize"
+  [style.fontFamily]="node.meta?.label?.fontFamily"
+  >
+    {{node.label}}
+  </div>
+
+</div>

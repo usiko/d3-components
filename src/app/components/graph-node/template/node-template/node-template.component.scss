@@ -1,0 +1,33 @@
+div.template {
+  height: 60px;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  div.node {
+    height: 30px;
+    width: 30px;
+    margin-top: 15px;
+
+    .circle {
+      border-radius: 15px;
+      border: solid 2px red;
+      background-color: white;
+      height: calc(100% - 4px);
+      width: calc(100% - 4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon {
+      color: red;
+    }
+  }
+
+  div.title {
+    height: 15px;
+    text-align: center;
+  }
+}
