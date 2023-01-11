@@ -14,9 +14,9 @@ export class AppComponent implements OnInit {
     links:IGraphLink[] = [];
   ngOnInit() {
     this.pieData = [
-      { label: 'option1', value: 5 },
-      { label: 'option2', value: 10 },
-      { label: 'option3', value: 15 }
+      { label: 'option1', value: 100 },
+      /*{ label: 'option2', value: 10 },
+      { label: 'option3', value: 15 }*/
     ];
     setTimeout(() => {
         this.nodes =   [
