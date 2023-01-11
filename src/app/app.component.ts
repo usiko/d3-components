@@ -10,9 +10,9 @@ export class AppComponent implements OnInit {
   pieData: { label: string, value: number; }[] = [];
   ngOnInit() {
     this.pieData = [
-      { label: 'option1', value: 5 },
-      { label: 'option2', value: 10 },
-      { label: 'option3', value: 15 }
+      { label: 'option1', value: 100 },
+      /*{ label: 'option2', value: 10 },
+      { label: 'option3', value: 15 }*/
     ];
     setInterval(() => {
       this.pieData = [...this.pieData, { label: 'option3', value: 15 }];
