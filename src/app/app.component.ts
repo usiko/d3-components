@@ -22,137 +22,126 @@ export class AppComponent implements OnInit {
             this.nodes = [
                 {
                     id: '1',
-                    label: 'Node A',
-
-                    data: {
-                        value: 1,
-
-
-                    },
-                    meta: {
-                        color: 'red',
-                        icon: {
-                            font: {
-                                name: 'A',
-                                frontSize: "2em",
-                                color: 'green'
-                            }
-                        },
-                        label: {
-                            color: "purple",
-                            fontFamily: "arial"
-
-                        }
+                    label: 'Node A'
+                    , data: {
+                        value: 4
                     }
-                },
-                {
+                }, {
                     id: '2',
                     label: 'Node B',
                     data: {
-                        value: 1,
-                    },
-                    meta: {
-                        color: 'blue',
-                        icon: {
-                            image: {
-                                src: 'https://picsum.photos/50/50'
-                            }
-                        }
+                        value: 4
                     }
-
-                },
-                {
+                }, {
                     id: '3',
                     label: 'Node C',
                     data: {
-                        value: 1,
-
-                    },
-                    meta: {
-                        color: 'green',
-                        icon: {
-                            font: {
-                                name: 'C'
-                            }
-                        }
+                        value: 4
                     }
-                },
-                {
+                }, {
                     id: '4',
                     label: 'Node D',
                     data: {
-                        value: 1
+                        value: 4
                     }
-                },
-                {
+                }, {
                     id: '5',
                     label: 'Node E',
                     data: {
-                        value: 1.5
+                        value: 4
                     }
-                },
-                {
+                }, {
                     id: '6',
                     label: 'Node F',
                     data: {
-                        value: 2
-                    }
-                },
-                {
-                    id: '7',
-                    label: 'Node G',
-                    data: {
-                        value: 2
+                        value: 4
                     }
                 }
-            ];
-            this.links = [
-
-                {
-                    id: 'a',
-                    source: '1',
-                    target: '2',
-                    meta: {
-                        color: 'red',
-                        width: 3
-                    }
-                },
-                {
-                    id: 'b',
-                    source: '1',
-                    target: '3',
-                    meta: {
-                        color: 'green',
-                        width: 3
-                    }
-                },
-                {
-                    id: 'c',
-                    source: '3',
-                    target: '4',
-                    meta: {
-                        color: 'purple',
-                        width: 3
-                    }
-                },
-                {
-                    id: 'f',
-                    source: '2',
-                    target: '6',
-                    meta: {
-                        color: 'purple',
-                        width: 1
-                    }
-                },
-                {
-                    id: 'g',
-                    source: '5',
-                    target: '7',
-                    meta: {
-                        color: 'yellow',
-                        width: 2
-                    }
+            ]
+            this.links = [{
+                id: 'a',
+                source: '1',
+                target: '2',
+                meta: {
+                    color: "blue"
                 }
+            },
+            {
+                id: 'azaz',
+                source: '1',
+                target: '4',
+                meta: {
+                    color: "blue"
+                }
+            },
+            {
+                id: 'azazazaz',
+                source: '1',
+                target: '5',
+                meta: {
+                    color: "blue"
+                }
+            },
+            {
+                id: 'bbbbb',
+                source: '2',
+                target: '5',
+                meta: {
+                    color: "blue"
+                }
+            },
+            {
+                id: 'ccccc',
+                source: '3',
+                target: '6',
+                meta: {
+                    color: "blue"
+                }
+            },
+            {
+                id: 'dddd',
+                source: '4',
+                target: '6',
+                meta: {
+                    color: "blue"
+                }
+            },
+            {
+                id: 'b',
+                source: '1',
+                target: '3',
+                meta: {
+                    color: "red"
+                }
+            }, {
+                id: 'c',
+                source: '3',
+                target: '4',
+                meta: {
+                    color: "blue"
+                }
+            }, {
+                id: 'd',
+                source: '3',
+                target: '5',
+                meta: {
+                    color: "blue"
+                }
+            }, {
+                id: 'e',
+                source: '4',
+                target: '5',
+                meta: {
+                    color: "blue"
+                }
+            }, {
+                id: 'f',
+                source: '2',
+                target: '6',
+                meta: {
+                    color: "red"
+                }
+            }
             ];
         }, (1000));
     }
