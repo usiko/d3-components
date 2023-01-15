@@ -48,7 +48,8 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
         if (changes['nodes'] || changes['links']) {
             if (this.graph) {
                 this.graph.nodes = this.nodes;
-                this.setLinks();
+                this.graph.links = this.links;
+                //this.setLinks();
             }
         }
     }
