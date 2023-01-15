@@ -13,6 +13,7 @@ export interface IGraphNode extends Node {
     meta?: {
         color: string;
 
+
         icon?: {
             font?: {
                 fontFamily?: string;

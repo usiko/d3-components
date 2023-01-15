@@ -1,53 +1,95 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { Subject } from 'rxjs';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { GraphComponent, NgxGraphModule } from '@swimlane/ngx-graph';
+import { interval, Subject, Subscription } from 'rxjs';
 import { IGraphLink, IGraphNode } from './graph-node.model';
 
 @Component({
-  selector: 'app-graph-node',
-  templateUrl: './graph-node.component.html',
-  styleUrls: ['./graph-node.component.scss']
+    selector: 'app-graph-node',
+    templateUrl: './graph-node.component.html',
+    styleUrls: ['./graph-node.component.scss']
 })
 export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
-  @Input() nodes: IGraphNode[] =[];
-  @Input() links: IGraphLink[] = [];
-  center$: Subject<boolean> = new Subject();
-  zoomToFit$: Subject<boolean> = new Subject();
-  update$: Subject<boolean> = new Subject();
+    @ViewChild(GraphComponent) graph?: GraphComponent;
+    @Input() nodes: IGraphNode[] = [];
+    @Input() links: IGraphLink[] = [];
+    center$: Subject<boolean> = new Subject();
+    zoomToFit$: Subject<boolean> = new Subject();
+    update$: Subject<boolean> = new Subject();
 
-  @Output() nodeOpen = new EventEmitter<IGraphNode>()
-
-
-  constructor(private element: ElementRef) { }
+    localLinks: IGraphLink[] = []
 
 
-  centerGraph() {
-    this.center$.next(true);
-  }
-  fitGraph() {
-    this.zoomToFit$.next(true);
-  }
-  updateGraph() {
-    this.update$.next(true);
-  }
+    @Output() nodeOpen = new EventEmitter<IGraphNode>()
 
-  ngAfterViewInit(): void {
 
-  }
+    constructor(private element: ElementRef) { }
 
-  ngOnInit(): void {
 
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['nodes'] || changes['links']) {
-      this.fitGraph();
-      this.centerGraph();
-      this.updateGraph();
+    centerGraph() {
+        this.center$.next(true);
     }
-  }
+    fitGraph() {
+        this.zoomToFit$.next(true);
+    }
+    updateGraph() {
+        this.update$.next(true);
+    }
 
-  onNodeOpen(node:IGraphNode)
-  {
-    this.nodeOpen.emit(node);
-  }
+    ngAfterViewInit(): void {
+
+    }
+
+    ngOnInit(): void {
+
+
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['nodes'] || changes['links']) {
+            if (this.graph) {
+                this.graph.nodes = this.nodes;
+                this.setLinks();
+            }
+        }
+    }
+
+
+    onNodeOpen(node: IGraphNode) {
+        this.nodeOpen.emit(node);
+    }
+
+    private setLinks() {
+        if (this.graph) {
+            const links = [...this.links];
+            const intervalSub: Subscription = interval(10).subscribe(() => {
+                if (links.length > 0) {
+
+                    if (this.graph) {
+                        const link = links.pop()
+                        if (link) {
+                            this.graph.links.push(link);
+                            /*this.graph.update();
+                            this.graph.center();
+                            this.graph.zoomToFit();*/
+
+                        }
+
+
+                    }
+                }
+                else {
+                    intervalSub.unsubscribe();
+                    console.log(this.graph);
+                    if (this.graph) {
+                        this.graph.update();
+                        this.graph.center();
+                        this.graph.zoomToFit();
+                    }
+                }
+            })
+
+
+
+        }
+    }
 }

@@ -50,9 +50,31 @@ export class AppComponent implements OnInit {
                     data: {
                         value: 4
                     }
-                }, {
+                },
+                {
                     id: '6',
                     label: 'Node F',
+                    data: {
+                        value: 4
+                    }
+                },
+                {
+                    id: '7',
+                    label: 'Node G',
+                    data: {
+                        value: 4
+                    }
+                },
+                {
+                    id: '8',
+                    label: 'Node H',
+                    data: {
+                        value: 4
+                    }
+                },
+                {
+                    id: '9',
+                    label: 'Node I',
                     data: {
                         value: 4
                     }
@@ -71,7 +93,23 @@ export class AppComponent implements OnInit {
                 source: '1',
                 target: '4',
                 meta: {
-                    color: "blue"
+                    color: "purple"
+                }
+            },
+            {
+                id: 'azaz18',
+                source: '1',
+                target: '8',
+                meta: {
+                    color: "yellow"
+                }
+            },
+            {
+                id: 'azaz17',
+                source: '1',
+                target: '7',
+                meta: {
+                    color: "black"
                 }
             },
             {
@@ -79,7 +117,7 @@ export class AppComponent implements OnInit {
                 source: '1',
                 target: '5',
                 meta: {
-                    color: "blue"
+                    color: "green"
                 }
             },
             {
@@ -87,7 +125,7 @@ export class AppComponent implements OnInit {
                 source: '2',
                 target: '5',
                 meta: {
-                    color: "blue"
+                    color: "grey"
                 }
             },
             {
@@ -95,7 +133,7 @@ export class AppComponent implements OnInit {
                 source: '3',
                 target: '6',
                 meta: {
-                    color: "blue"
+                    color: "orange"
                 }
             },
             {
@@ -107,18 +145,18 @@ export class AppComponent implements OnInit {
                 }
             },
             {
-                id: 'b',
+                id: 'bazazazaz',
                 source: '1',
                 target: '3',
                 meta: {
-                    color: "red"
+                    color: "pink"
                 }
             }, {
                 id: 'c',
                 source: '3',
                 target: '4',
                 meta: {
-                    color: "blue"
+                    color: "marron"
                 }
             }, {
                 id: 'd',
@@ -138,6 +176,23 @@ export class AppComponent implements OnInit {
                 id: 'f',
                 source: '2',
                 target: '6',
+                meta: {
+                    color: "red"
+                }
+
+            },
+            {
+                id: 'azaz28',
+                source: '2',
+                target: '8',
+                meta: {
+                    color: "red"
+                }
+            },
+            {
+                id: 'azaz29',
+                source: '2',
+                target: '9',
                 meta: {
                     color: "red"
                 }
