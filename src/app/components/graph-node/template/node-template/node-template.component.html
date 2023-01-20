@@ -1,5 +1,5 @@
 <div class="template" (dblclick)="onDblclick()">
-    <div class="node" [ngClass]="node.meta?.cssClass">
+    <div class="node" [ngClass]="node.meta?.cssClass ||''">
         <div class="circle" [style.borderColor]="node.meta?.color">
             <ng-container *ngIf="node.meta?.icon?.font">
                 <div class="icon" [style.color]="node.meta?.icon?.font?.color || node.meta?.color " [style.fontSize]="node.meta?.icon?.font?.frontSize" [style.fontFamily]="node.meta?.icon?.font?.fontFamily">
