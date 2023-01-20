@@ -14,6 +14,9 @@
 			<ng-container *ngIf="node.meta?.icon?.image">
 				<div class="icon img" [style.backgroundImage]="'url('+node.meta?.icon?.image?.src+')'"></div>
 			</ng-container>
+			<ng-container *ngIf="node.meta?.icon?.svg">
+                <object class="icon svg" data="node.meta?.icon?.svg?.src"  type="image/svg+xml"></object>
+			</ng-container>
 		</div>
 		<div
 			class="title"

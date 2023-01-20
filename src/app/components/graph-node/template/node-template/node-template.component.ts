@@ -10,9 +10,13 @@ export class NodeTemplateComponent implements OnInit {
 
   @Input() node!:IGraphNode;
   @Output() dblClick = new EventEmitter<never>()
-  constructor() { }
+  constructor(private element:ElementRef) { }
 
-  ngOnInit(): void {
+    ngOnInit(): void {
+        if (this.node.icon.color)
+        {
+            this.element.nativeElement.querySelector('.icon.img')
+          }
   }
 
   onDblclick()
