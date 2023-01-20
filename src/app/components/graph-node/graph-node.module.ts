@@ -1,4 +1,5 @@
 //NgxGraphModuleimport { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
@@ -8,17 +9,18 @@ import { NodeTemplateComponent } from './template/node-template/node-template.co
 
 
 @NgModule({
-  declarations: [
-    GraphNodeComponent,
-    NodeTemplateComponent,
-  ],
-  imports: [
-    BrowserModule,
-NgxGraphModule
-  ],
-  exports:[
-    GraphNodeComponent
-  ],
-  providers: []
+    declarations: [
+        GraphNodeComponent,
+        NodeTemplateComponent,
+    ],
+    imports: [
+        BrowserModule,
+        NgxGraphModule,
+        CommonModule
+    ],
+    exports: [
+        GraphNodeComponent
+    ],
+    providers: []
 })
 export class GraphNodeModule { }
