@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { GraphComponent, NgxGraphModule } from '@swimlane/ngx-graph';
 import { interval, Subject, Subscription } from 'rxjs';
-import { IGraphLink, IGraphNode,IGraphConfig } from './graph-node.model';
+import { IGraphLink, IGraphNode, IGraphConfig } from './graph-node.model';
 
 @Component({
     selector: 'app-graph-node',
@@ -12,7 +12,7 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
     @ViewChild(GraphComponent) graph?: GraphComponent;
     @Input() nodes: IGraphNode[] = [];
     @Input() links: IGraphLink[] = [];
-    @Input() config: IGraphConfig = { sizeNode: 20,labelSize:25 };
+    @Input() config: IGraphConfig = { nodeSize: 20, labelHeight: 25 };
     center$: Subject<boolean> = new Subject();
     zoomToFit$: Subject<boolean> = new Subject();
     update$: Subject<boolean> = new Subject();
@@ -50,7 +50,9 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
             if (this.graph) {
                 this.graph.nodes = this.nodes;
                 this.graph.links = this.links;
-                //this.setLinks();
+                this.graph.update();
+                this.graph.center();
+                this.graph.zoomToFit();
             }
         }
     }
