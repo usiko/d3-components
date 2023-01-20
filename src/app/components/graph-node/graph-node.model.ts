@@ -1,5 +1,10 @@
 import { ClusterNode, Edge, Node } from '@swimlane/ngx-graph';
 
+export interface IGraphConfig{
+    nodeSize: number;
+    labelHeight: number;
+}
+
 export interface IGraphLink extends Edge {
     meta?: {
         color?: string;

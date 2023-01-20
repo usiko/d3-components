@@ -1,17 +1,20 @@
 <ngx-graph class="chart-container" [center$]="center$" layout="d3ForceDirected" [zoomToFit$]="zoomToFit$" [update$]="update$">
+	<ng-template #nodeTemplate let-node>
+		<svg:foreignObject
+			[attr.height]="(config.nodeSize*node.data.value)+(config.labelSize*2)"
+			[attr.width]="(config.nodeSize*node.data.value)+(config.labelSize*2)"
+		>
+			<app-node-template (dblClick)="onNodeOpen(node)" [node]="node"></app-node-template>
+		</svg:foreignObject>
+	</ng-template>
 
-    <ng-template #nodeTemplate let-node>
-        <svg:foreignObject [attr.height]="20*node.data.value" [attr.width]="20*node.data.value">
-            <app-node-template (dblClick)="onNodeOpen(node)" [node]="node"></app-node-template>
-        </svg:foreignObject>
-    </ng-template>
-
-
-    <ng-template #linkTemplate let-link let-node>
-        source: {{node|json}}
-        <svg:path [attr.d]="link.line" [ngClass]="link.meta?.cssClass" [attr.marker-end]="link.meta?.markerEnd" [attr.stroke-width]="link.meta?.width" [attr.stroke]="link.meta?.color||'red'">
-        </svg:path>
-    </ng-template>
-
-
+	<ng-template #linkTemplate let-link let-node>
+		<svg:path
+			[attr.d]="link.line"
+			[ngClass]="link.meta?.cssClass"
+			[attr.marker-end]="link.meta?.markerEnd"
+			[attr.stroke-width]="link.meta?.width"
+			[attr.stroke]="link.meta?.color||'red'"
+		></svg:path>
+	</ng-template>
 </ngx-graph>
