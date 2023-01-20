@@ -1,20 +1,27 @@
 <div class="template" (dblclick)="onDblclick()">
-    <div class="node">
-
-        <div class="circle" [style.borderColor]="node.meta?.color">
-            <ng-container *ngIf="node.meta?.icon?.font">
-                <div class="icon" [style.color]="node.meta?.icon?.font?.color || node.meta?.color " [style.fontSize]="node.meta?.icon?.font?.frontSize" [style.fontFamily]="node.meta?.icon?.font?.fontFamily">
-                    {{node.meta?.icon?.font?.name}}
-                </div>
-            </ng-container>
-            <ng-container *ngIf="node.meta?.icon?.image">
-                <div class="icon img" [style.backgroundImage]="'url('+node.meta?.icon?.image?.src+')'">
-
-                </div>
-            </ng-container>
-        </div>
-        <div class="title" [style.color]="node.meta?.label?.color" [style.fontSize]="node.meta?.label?.fontSize" [style.fontFamily]="node.meta?.label?.fontFamily">
-            {{node.label}}
-        </div>
-    </div>
+	<div class="node" [ngClass]="node.cssClass">
+		<div class="circle" [style.borderColor]="node.meta?.color">
+			<ng-container *ngIf="node.meta?.icon?.font">
+				<div
+					class="icon"
+					[style.color]="node.meta?.icon?.font?.color || node.meta?.color "
+					[style.fontSize]="node.meta?.icon?.font?.frontSize"
+					[style.fontFamily]="node.meta?.icon?.font?.fontFamily"
+				>
+					{{node.meta?.icon?.font?.name}}
+				</div>
+			</ng-container>
+			<ng-container *ngIf="node.meta?.icon?.image">
+				<div class="icon img" [style.backgroundImage]="'url('+node.meta?.icon?.image?.src+')'"></div>
+			</ng-container>
+		</div>
+		<div
+			class="title"
+			[style.color]="node.meta?.label?.color"
+			[style.fontSize]="node.meta?.label?.fontSize"
+			[style.fontFamily]="node.meta?.label?.fontFamily"
+		>
+			{{node.label}}
+		</div>
+	</div>
 </div>
