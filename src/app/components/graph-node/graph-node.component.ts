@@ -37,7 +37,44 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     ngAfterViewInit(): void {
+        if (this.graph) {
 
+            this.graph.onZoom = ((event, direction: string) => {
+                if (this.graph) {
+                    if (event.ctrlKey) {
+                        if (this.graph.enableTrackpadSupport && !event.ctrlKey) {
+                            this.graph.pan(event.deltaX * -1, event.deltaY * -1);
+                            return;
+                        }
+                        const zoomFactor = 1 + (direction === 'in' ? this.graph.zoomSpeed : -this.graph.zoomSpeed); // Check that zooming wouldn't put us out of bounds
+                        const newZoomLevel = this.graph.zoomLevel * zoomFactor;
+                        if (newZoomLevel <= this.graph.minZoomLevel || newZoomLevel >= this.graph.maxZoomLevel) {
+                            return;
+                        } // Check if zooming is enabled or not
+                        if (!this.graph.enableZoom) {
+                            return;
+                        }
+                        if (this.graph.panOnZoom === true && event) {
+                            // Absolute mouse X/Y on the screen
+                            const mouseX = event.clientX;
+                            const mouseY = event.clientY; // Transform the mouse X/Y into a SVG X/Y
+                            const svg = this.graph['el'].nativeElement.querySelector('svg');
+                            const svgGroup = svg.querySelector('g.chart');
+                            const point = svg.createSVGPoint();
+                            point.x = mouseX;
+                            point.y = mouseY;
+                            const svgPoint = point.matrixTransform(svgGroup.getScreenCTM().inverse()); // Panzoom
+                            this.graph.pan(svgPoint.x, svgPoint.y, true);
+                            this.graph.zoom(zoomFactor);
+                            this.graph.pan(-svgPoint.x, -svgPoint.y, true);
+                        } else {
+                            this.graph.zoom(zoomFactor);
+                        }
+                    }
+                }
+            });
+
+        }
     }
 
     ngOnInit(): void {
