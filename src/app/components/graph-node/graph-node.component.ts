@@ -1,30 +1,31 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { GraphComponent, NgxGraphModule } from '@swimlane/ngx-graph';
+import { PopperContent } from 'ngx-popper';
 import { interval, Subject, Subscription } from 'rxjs';
 import { IGraphLink, IGraphNode, IGraphConfig } from './graph-node.model';
 
 @Component({
     selector: 'app-graph-node',
     templateUrl: './graph-node.component.html',
-    styleUrls: ['./graph-node.component.scss']
+    styleUrls: ['./graph-node.component.scss'],
 })
 export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
     @ViewChild(GraphComponent) graph?: GraphComponent;
+    @ViewChild(PopperContent) popperContent?: PopperContent;
     @Input() nodes: IGraphNode[] = [];
     @Input() links: IGraphLink[] = [];
     @Input() config: IGraphConfig = { nodeSize: 20, labelHeight: 25 };
+    @Input() tooltipTemplate?: TemplateRef<any>;
     center$: Subject<boolean> = new Subject();
     zoomToFit$: Subject<boolean> = new Subject();
     update$: Subject<boolean> = new Subject();
 
-    localLinks: IGraphLink[] = []
+    localLinks: IGraphLink[] = [];
 
-
-    @Output() nodeOpen = new EventEmitter<IGraphNode>()
-
+    @Output() nodeOpen = new EventEmitter<IGraphNode>();
+    nodeHover?: IGraphNode;
 
     constructor(private element: ElementRef) { }
-
 
     centerGraph() {
         this.center$.next(true);
@@ -38,8 +39,26 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
 
     ngAfterViewInit(): void {
         if (this.graph) {
+            // bind drag fn
+            const dragFn = this.graph.onDrag.bind(this.graph);
+            this.graph.onDrag = (event: MouseEvent) => {
+                dragFn(event);
+                if (this.popperContent && this.nodeHover) {
+                    this.popperContent.update();
+                }
+            };
 
-            this.graph.onZoom = ((event, direction: string) => {
+            // bind zoom
+            const zoomFn = this.graph.onZoom.bind(this.graph);
+            this.graph.onZoom = (event, direction: string) => {
+                if (event.ctrlKey) {
+                    zoomFn(event, direction);
+                    if (this.popperContent && this.nodeHover) {
+                        this.popperContent.update();
+                    }
+                }
+            };
+            /*this.graph.onZoom = ((event, direction: string) => {
                 if (this.graph) {
                     if (event.ctrlKey) {
                         if (this.graph.enableTrackpadSupport && !event.ctrlKey) {
@@ -72,14 +91,18 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
                         }
                     }
                 }
-            });
-
+            });*/
         }
     }
 
-    ngOnInit(): void {
+    ngOnInit(): void { }
 
-
+    onNodeHover(node: IGraphNode) {
+        if (node.data.tooltipData) {
+            this.nodeHover = node;
+        } else {
+            this.nodeHover = undefined;
+        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -94,7 +117,6 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
         }
     }
 
-
     onNodeOpen(node: IGraphNode) {
         this.nodeOpen.emit(node);
     }
@@ -104,21 +126,16 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
             const links = [...this.links];
             const intervalSub: Subscription = interval(10).subscribe(() => {
                 if (links.length > 0) {
-
                     if (this.graph) {
-                        const link = links.pop()
+                        const link = links.pop();
                         if (link) {
                             this.graph.links.push(link);
                             /*this.graph.update();
                             this.graph.center();
                             this.graph.zoomToFit();*/
-
                         }
-
-
                     }
-                }
-                else {
+                } else {
                     intervalSub.unsubscribe();
                     console.log(this.graph);
                     if (this.graph) {
@@ -127,10 +144,7 @@ export class GraphNodeComponent implements OnInit, AfterViewInit, OnChanges {
                         this.graph.zoomToFit();
                     }
                 }
-            })
-
-
-
+            });
         }
     }
 }

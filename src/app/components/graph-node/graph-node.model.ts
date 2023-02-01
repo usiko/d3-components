@@ -50,7 +50,8 @@ export interface IGraphNode extends Node {
 		};
 	};
 	data: {
-		value: number;
+        value: number;
+        tooltipData?:any;
 	};
 }
 export interface IGraphClusterNode extends ClusterNode {

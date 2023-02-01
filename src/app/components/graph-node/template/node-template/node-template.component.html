@@ -1,4 +1,11 @@
-<div class="template" (dblclick)="onDblclick()">
+<div class="template" *ngIf="!popperContent" (dblclick)="onDblclick()" (mouseenter)="nodeHover()">
+    <ng-container *ngTemplateOutlet="nodeTemplateContent"></ng-container>
+</div>
+<div class="template" *ngIf="popperContent" [popper]="popperContent" [popperTrigger]="'hover'" (dblclick)="onDblclick()" (mouseenter)="nodeHover()">
+    <ng-container *ngTemplateOutlet="nodeTemplateContent"></ng-container>
+</div>
+
+<ng-template #nodeTemplateContent>
     <div class="node" [ngClass]="node.meta?.cssClass ||''">
         <div class="circle" [style.borderColor]="node.meta?.color">
             <ng-container *ngIf="node.meta?.icon?.font">
@@ -17,4 +24,4 @@
             {{node.label}}
         </div>
     </div>
-</div>
+</ng-template>

@@ -30,7 +30,12 @@ export class AppComponent implements OnInit {
                     id: '2',
                     label: 'Node B',
                     data: {
-                        value: 4
+                        value: 4,
+                        tooltipData:{
+                            title:'node a',
+                            subTitle:'super node with a letter',
+                            content:'more content about this awesome node A'
+                          }
                     }
                 }, {
                     id: '3',
@@ -76,7 +81,12 @@ export class AppComponent implements OnInit {
                     id: '9',
                     label: 'Node I',
                     data: {
-                        value: 4
+                        value: 4,
+                        tooltipData:{
+                            title:'node D',
+                            subTitle:'super node with d letter',
+                            content:'more content about this awesome node D, better than C'
+                          }
                     }
                 }
             ]
