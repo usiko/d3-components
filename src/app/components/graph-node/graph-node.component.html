@@ -1,7 +1,7 @@
 <ngx-graph class="chart-container" [center$]="center$" layout="d3ForceDirected" [zoomToFit$]="zoomToFit$" [update$]="update$">
     <ng-template #nodeTemplate let-node>
         <svg:foreignObject [attr.height]="(config.nodeSize*node.data.value)+(config.labelHeight*2)" [attr.width]="(config.nodeSize*node.data.value)+(config.labelHeight*2)">
-            <app-node-template (dblClick)="onNodeOpen(node)" [node]="node"></app-node-template>
+            <app-node-template (dblClick)="onNodeOpen(node)" (hover)="onNodeHover(node)" [node]="node" [popperContent]="nodeHover?tooltip:undefined"></app-node-template>
         </svg:foreignObject>
     </ng-template>
 
@@ -9,3 +9,9 @@
         <svg:path [attr.d]="link.line" [ngClass]="link.meta?.cssClass" [attr.marker-end]="link.meta?.markerEnd" [attr.stroke-width]="link.meta?.width" [attr.stroke]="link.meta?.color||'red'"></svg:path>
     </ng-template>
 </ngx-graph>
+
+<popper-content #tooltip >
+    <ng-container *ngIf="tooltipTemplate && nodeHover" >
+        <ng-container [ngTemplateOutlet]="tooltipTemplate" [ngTemplateOutletContext]="{data:nodeHover.data.tooltipData}"  ></ng-container>
+    </ng-container>
+</popper-content>
