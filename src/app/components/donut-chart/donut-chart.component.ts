@@ -487,7 +487,13 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 		d3.selectAll('.legend').transition().duration(350).attr('transform', 'scale(1)');
 
 		if (this.hoveredId) {
-			d3.select('.arc.id-' + this.hoveredId)
+			let idSelector;
+			if (this.selectedId) {
+				idSelector = '.id-' + this.hoveredId + ':not(.arc.id-' + this.selectedId + ')';
+			} else {
+				idSelector = '.id-' + this.hoveredId;
+			}
+			d3.select('.arc' + idSelector)
 				.transition()
 				.duration(350)
 				.attr('transform', 'scale(1.05)')
@@ -496,11 +502,11 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 			d3.selectAll('.legend-line').transition().duration(350).attr('transform', 'scale(0.95)');
 			d3.selectAll('.legend').transition().duration(350).attr('transform', 'scale(0.95)');
 
-			d3.select('.legend-line.id-' + this.hoveredId)
+			d3.select('.legend-line' + idSelector)
 				.transition()
 				.duration(350)
 				.attr('transform', 'scale(1.1)');
-			d3.select('.legend.id-' + this.hoveredId)
+			d3.select('.legend' + idSelector)
 				.transition()
 				.duration(350)
 				.attr('transform', 'scale(1.1)');
