@@ -45,7 +45,8 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 	private pie?: Pie<any, IPieData>;
 
-	private resizeObserver?: ResizeObserver;
+    private resizeObserver?: ResizeObserver;
+    private ready: boolean = false;
 	constructor() {}
 
 	ngOnInit(): void {
@@ -66,7 +67,8 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['data']) {
-			if (this.pie) {
+            if (this.pie) {
+                this.ready = false;
 				console.log('update', this.data);
 				this.data = this.data.sort((a, b) => {
 					if (a.value < b.value) {
@@ -214,8 +216,13 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 				});
 
 			this.dataContainer
-				.selectAll('g.arc')
-				.select('path')
+                .selectAll('g.arc')
+                
+                .select('path')
+                .attr('stroke-width', '0px')
+                .attr('stroke', (d:any) => {
+                    return d.data.activeStroke?.color;
+                })
 				.attr('fill', (d: any, i) => {
 					console.log(d, i);
 					if (d.data.color) {
@@ -228,7 +235,10 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 				.duration(1000)
 				.attrTween('d', (d: any, index, n) => {
 					return this.pieTransition(d, index, n) as any;
-				});
+                }).
+                on('end', () => {
+                    this.ready = true;
+                })
 
 			//
 
@@ -466,23 +476,29 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 		}
 	}
 
-	private onMouseenterItem(id: string) {
-		this.hoverItem.emit(id);
+    private onMouseenterItem(id: string) {
+        if (this.ready) {
+            this.hoverItem.emit(id);
+        }
 
 		/**/
 	}
 
 	private onMouseleaveItem(id: string) {
 		console.log('leave', id, this.hoveredId);
-		if (!this.hoveredId || (this.hoveredId && id !== this.hoveredId)) {
+        if (this.ready)
+        {
+            if (!this.hoveredId || (this.hoveredId && id !== this.hoveredId)) {
 			this.hoverItem.emit(id);
 		} else {
 			this.hoverItem.emit(undefined);
 		}
+            }
 	}
 
 	private hoverAnimate() {
-		d3.selectAll('.arc').transition().duration(350).attr('transform', 'scale(1)').attr('stroke', 'transparent');
+		d3.selectAll('.arc').transition().duration(350).attr('transform', 'scale(1)');
+		d3.selectAll('.arc path').transition().duration(350).attr('stroke-width', '0px');
 		d3.selectAll('.legend-line').transition().duration(350).attr('transform', 'scale(1)');
 		d3.selectAll('.legend').transition().duration(350).attr('transform', 'scale(1)');
 
@@ -493,11 +509,17 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 			} else {
 				idSelector = '.id-' + this.hoveredId;
 			}
-			d3.select('.arc' + idSelector)
-				.transition()
+            d3.select('.arc' + idSelector)
+                .transition()
+                .duration(350)
+                .attr('transform', 'scale(1.05)');
+            
+            	d3.select('.arc' + idSelector+' path')
+                .transition()
 				.duration(350)
-				.attr('transform', 'scale(1.05)')
-				.attr('stroke', 'red');
+                .attr('stroke-width', (d:any) => {
+                    return (d.data.activeStroke?.width||0)+'px'
+                })
 
 			d3.selectAll('.legend-line').transition().duration(350).attr('transform', 'scale(0.95)');
 			d3.selectAll('.legend').transition().duration(350).attr('transform', 'scale(0.95)');
@@ -512,11 +534,17 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 				.attr('transform', 'scale(1.1)');
 		}
 		if (this.selectedId) {
-			d3.select('.arc.id-' + this.selectedId)
-				.transition()
+            d3.select('.arc.id-' + this.selectedId)
+                .transition()
+                .duration(350)
+                .attr('transform', 'scale(1.05)');
+            
+                d3.select('.arc.id-' + this.selectedId+ ' path')
+                .transition()
 				.duration(350)
-				.attr('transform', 'scale(1.05)')
-				.attr('stroke', 'red');
+				.attr('stroke-width', (d:any) => {
+                    return (d.data.activeStroke?.width||0)+'px'
+                })
 
 			d3.selectAll('.legend-line').transition().duration(350).attr('transform', 'scale(0.95)');
 			d3.selectAll('.legend').transition().duration(350).attr('transform', 'scale(0.95)');

@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
 		];
 		setTimeout(() => {
 			this.pieData = [
-				{ id: 'ts', label: { name: 'Typescript', picture: 'test' }, value: 12, clickable: true, color: 'red' },
+				{ id: 'ts', label: { name: 'Typescript', picture: 'test' }, value: 12, clickable: true, activeStroke:{color:'rgba(255,0,0)', width:4} },
 				{ id: 'ng', label: { name: 'Angular', picture: 'test' }, value: 10, clickable: true },
 				{ id: 'io', label: { name: 'Ionic', picture: 'test' }, value: 8, clickable: true },
 
