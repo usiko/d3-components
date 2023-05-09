@@ -300,7 +300,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 	private buildLegends(data: IPieData[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
 		if (this.pie) {
 			const pieData = this.pie(data);
-
+            group.selectAll('g.legend').remove();
 			const enter = group
 				.selectAll('text')
 				.data(pieData)
@@ -351,10 +351,12 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 				.selectAll('image')
 				.attr('xlink:href', (d: any) => {
 					if (d.data.label.picture) {
-						return 'https://picsum.photos/40/40';
+						return d.data.label.picture;
 					}
 					return '';
-				})
+                })
+                .attr('height','40px')
+                .attr('width','40px')
 
 				.transition()
 				.duration(1000)
