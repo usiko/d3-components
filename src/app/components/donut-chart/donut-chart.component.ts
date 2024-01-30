@@ -37,6 +37,10 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 	private height = 0;
 	private width = 0;
 
+    public outerRadius = 0.6;
+
+    public legendFactor = 0.33;
+
 	private svg?: Selection<SVGSVGElement, unknown, HTMLElement, any>;
 	private dataContainer?: Selection<SVGGElement, unknown, HTMLElement, any>;
 
@@ -139,17 +143,17 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 	}
 
 	setArcs() {
-		const radius = Math.min(this.width, this.height) / 2;
-		const innerRadius = this.innerRadiusRatio ? radius * 0.6 * (this.innerRadiusRatio / 100) : 0; // percent ratio
+		const radius = Math.min(this.width, this.height) *0.33;
+		const innerRadius = this.innerRadiusRatio ? radius * this.outerRadius * (this.innerRadiusRatio / 100) : 0; // percent ratio
 
 		this.arc = d3
 			.arc()
 			.innerRadius(innerRadius)
-			.outerRadius(radius * 0.6);
+			.outerRadius(radius * this.outerRadius);
 		this.outerArc = d3
 			.arc()
-			.innerRadius(radius * 0.7)
-			.outerRadius(radius * 0.7);
+			.innerRadius(radius * this.outerRadius * 1.2)
+			.outerRadius(radius * this.outerRadius * 1.2);
 	}
 
 	/**
@@ -300,7 +304,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 	private buildLegends(data: IPieData[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
 		if (this.pie) {
 			const pieData = this.pie(data);
-            group.selectAll('g.legend').remove();
 			const enter = group
 				.selectAll('text')
 				.data(pieData)
@@ -387,7 +390,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 		return (t: any) => {
 			if (this.outerArc) {
-				const radius = Math.min(this.width, this.height) / 2;
+				const radius = Math.min(this.width, this.height) *0.33;
 				var d2 = interpolate(t);
 				var pos = this.outerArc.centroid(d2);
 				let margin = 15;
@@ -407,7 +410,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 		return (t: any) => {
 			if (this.outerArc) {
-				const radius = Math.min(this.width, this.height) / 2;
+				const radius = Math.min(this.width, this.height) *0.33;
 				var d2 = interpolate(t);
 				var pos = this.outerArc.centroid(d2);
 				const margin = 15;
@@ -441,7 +444,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 
 		return (t: any) => {
 			if (this.outerArc && this.arc) {
-				const radius = Math.min(this.width, this.height) / 2;
+				const radius = Math.min(this.width, this.height) *0.33;
 				var d2 = interpolate(t);
 				var pos = this.outerArc.centroid(d2);
 				pos[0] = radius * 0.7 * (this.getMidAngle(d2.startAngle, d2.endAngle) < Math.PI ? 1 : -1);

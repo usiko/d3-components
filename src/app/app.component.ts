@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
       { label: 'option3', value: 15 }*/
 		];
 		setTimeout(() => {
-			this.pieData = [
+			/*this.pieData = [
 				{ id: 'ts', label: { name: 'Typescript', picture: 'test' }, value: 12, clickable: true, activeStroke:{color:'rgba(255,0,0)', width:4} },
 				{ id: 'ng', label: { name: 'Angular', picture: 'test' }, value: 10, clickable: true },
 				{ id: 'io', label: { name: 'Ionic', picture: 'test' }, value: 8, clickable: true },
@@ -33,7 +33,11 @@ export class AppComponent implements OnInit {
 
 				{ id: 'sass', label: { name: 'Sass', picture: 'test' }, value: 25, clickable: true },
 				{ id: 'html', label: { name: 'Html', picture: 'test' }, value: 15, clickable: true },
-			];
+			];*/
+            this.pieData = [
+                { id: 'ts', label: { name: 'Typescript', picture: 'test' }, value: 70, clickable: true, activeStroke:{color:'rgba(255,0,0)', width:4} },
+				{ id: 'ng', label: { name: 'Angular', picture: 'test' }, value: 30, clickable: true },
+            ]
 		}, 1000);
 		setTimeout(() => {
 			this.nodes = [
