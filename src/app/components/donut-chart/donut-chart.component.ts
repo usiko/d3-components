@@ -314,7 +314,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
                 });
             
 			 group
-				.selectAll('image')
+				.selectAll('g.legend image')
 				.data(pieData)
 				.enter()
 				.append('image')
@@ -322,7 +322,7 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
             
             
 			 group
-            .selectAll('text')
+            .selectAll('g.legend text')
             .data(pieData)
             .enter()
             .append('text')
@@ -349,8 +349,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 				}
 				return '';
 			});
-			enter.append('text');
-			enter.append('image');
 
 			group
 				.selectAll('text')
