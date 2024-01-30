@@ -304,7 +304,6 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 	private buildLegends(data: IPieData[], group: Selection<SVGGElement, unknown, HTMLElement, any>) {
 		if (this.pie) {
 			const pieData = this.pie(data);
-            group.selectAll('g.legend').remove();
 			const enter = group
 				.selectAll('text')
 				.data(pieData)
