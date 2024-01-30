@@ -1,4 +1,12 @@
 <div class="donut">
-    <app-donut-chart [data]="pieData" [colors]="['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56']" [innerRadiusRatio]="75"></app-donut-chart>
+	<app-donut-chart
+		(selectItem)="selectItemDonut($event)"
+		(hoverItem)="hoverItemDonut($event)"
+		[hoveredId]="hoveredItemDonut"
+		[selectedId]="selectedItemDonut"
+		[data]="pieData"
+		[colors]="['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56']"
+		[innerRadiusRatio]="75"
+	></app-donut-chart>
 </div>
-<app-graph-node [links]="links" [nodes]="nodes" (nodeOpen)="onNodeOpen($event)"  [style.height.px]="600"></app-graph-node>
+<app-graph-node [links]="links" [nodes]="nodes" (nodeOpen)="onNodeOpen($event)" [style.height.px]="600"></app-graph-node>
