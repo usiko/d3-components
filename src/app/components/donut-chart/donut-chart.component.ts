@@ -305,13 +305,30 @@ export class DonutChartComponent implements OnInit, AfterViewInit, OnDestroy, On
 		if (this.pie) {
 			const pieData = this.pie(data);
 			const enter = group
-				.selectAll('text')
+				.selectAll('g.legend')
 				.data(pieData)
 				.enter()
 				.append('g')
 				.attr('class', (d) => {
 					return 'legend id-' + d.data.id;
-				});
+                });
+            
+			 group
+				.selectAll('image')
+				.data(pieData)
+				.enter()
+				.append('image')
+				
+            
+            
+			 group
+            .selectAll('text')
+            .data(pieData)
+            .enter()
+            .append('text')
+            
+
+
 			enter.on('mouseenter', (event, d) => {
 				if (d.data.clickable) {
 					this.onMouseenterItem(d.data.id);
